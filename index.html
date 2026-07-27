@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="LEBON — производство упаковочных коробок в Москве. 12 лет опыта, каталог с фильтрами, корзина, доставка по РФ.">
+  <meta name="keywords" content="купить коробку, упаковочные коробки, коробки Lebon, производство коробок Москва, коробки оптом, корзина">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#1a1f2e">
+  <title>LEBON — Производство упаковочных коробок | Каталог, корзина</title>
+  <style>
+    :root {
+      --bg-dark: #1a1f2e;
+      --bg-light: #f8f7f4;
+      --white: #ffffff;
+      --accent: #e8a850;
+      --accent-hover: #f0c070;
+      --accent-soft: #fdf3e4;
+      --text-dark: #1e1e1e;
+      --text-mid: #4a4a4a;
+      --text-light: #6b6b6b;
+      --border: #e2ddd4;
+      --border-light: #f0ebe0;
+      --shadow-sm: 0 4px 14px rgba(0,0,0,0.06);
+      --shadow-md: 0 10px 30px rgba(0,0,0,0.1);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+    /* Анимация */
+    .box-animation-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(26,31,46,0.96); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeOut 0.6s ease 2.2s forwards; pointer-events: all;
+    }
+    .box-scene { position: relative; width: 160px; height: 160px; }
+    .box-lid {
+      position: absolute; width: 130px; height: 65px; background: var(--accent);
+      border-radius: 10px 10px 0 0; top: 8px; left: 15px;
+      transform-origin: left bottom; animation: openLid 0.8s ease 0.6s forwards;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.3); z-index: 2;
+    }
+    .box-body {
+      width: 130px; height: 90px; background: linear-gradient(180deg, #d4953a, #b07028);
+      border-radius: 0 0 8px 8px; position: absolute; bottom: 15px; left: 15px;
+      box-shadow: inset 0 -8px 16px rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; color: white; text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+    .box-text {
+      position: absolute; bottom: -45px; color: white; font-weight: 700;
+      font-size: 1.1rem; letter-spacing: 4px; text-align: center; width: 100%;
+      animation: fadeInText 0.5s ease 1s forwards; opacity: 0;
+    }
+    @keyframes openLid { 0% { transform: rotate(0deg); } 100% { transform: rotate(-130deg); } }
+    @keyframes fadeOut { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
+    @keyframes fadeInText { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    /* Летающая корзина */
+    .floating-cart {
+      position: fixed; left: 20px; top: 50%; transform: translateY(-50%);
+      z-index: 500; display: flex; flex-direction: column; align-items: center;
+      gap: 6px; background: var(--white); padding: 14px 10px;
+      border-radius: 40px; box-shadow: var(--shadow-md); border: 2px solid var(--accent);
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .floating-cart:hover { transform: translateY(-50%) scale(1.05); box-shadow: 0 14px 35px rgba(232,168,80,0.3); }
+    .floating-cart-icon { font-size: 1.8rem; }
+    .floating-cart-count {
+      background: var(--accent); color: white; border-radius: 50%;
+      width: 26px; height: 26px; display: flex; align-items: center;
+      justify-content: center; font-size: 0.8rem; font-weight: 700;
+      animation: popIn 0.3s ease;
+    }
+    .floating-cart-total { font-size: 0.7rem; font-weight: 700; color: var(--text-mid); }
+    @keyframes popIn { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+
+    /* Модалки */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); z-index: 1000; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--white); border-radius: var(--radius); max-width: 560px;
+      width: 100%; padding: 28px; position: relative;
+      animation: modalIn 0.3s ease; max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .modal-close {
+      position: absolute; top: 14px; right: 18px; font-size: 1.5rem;
+      cursor: pointer; background: none; border: none; color: #999; font-weight: 700;
+    }
+    .modal-close:hover { color: #333; }
+
+    /* Полноэкранный каталог */
+    .fullscreen-catalog {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-light); z-index: 999; overflow-y: auto; display: none; padding: 20px 0;
+    }
+    .fullscreen-catalog.active { display: block; }
+    .catalog-header {
+      position: sticky; top: 0; background: var(--bg-light); z-index: 10;
+      padding: 14px 0; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+      border-bottom: 1px solid var(--border); margin-bottom: 24px;
+    }
+
+    /* Кнопки */
+    .btn {
+      background: var(--bg-dark); color: white; border: none;
+      padding: 12px 26px; font-weight: 700; cursor: pointer;
+      border-radius: 30px; transition: all 0.3s; font-family: inherit;
+      font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px;
+      letter-spacing: 0.3px;
+    }
+    .btn:hover { background: #2d3548; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,31,46,0.3); }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: var(--accent-hover); box-shadow: 0 8px 20px rgba(232,168,80,0.4); }
+    .btn-outline { background: transparent; border: 2px solid var(--bg-dark); color: var(--bg-dark); }
+    .btn-outline:hover { background: var(--bg-dark); color: white; }
+    .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
+
+    /* Страница контактов */
+    .contacts-page { display: none; padding: 40px 0; background: var(--white); min-height: 80vh; }
+    .contacts-page.active { display: block; }
+
+    /* Header */
+    .site-header {
+      background: var(--bg-dark); position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.2); border-bottom: 2px solid var(--accent);
+    }
+    .header-inner {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; flex-wrap: wrap; gap: 14px;
+    }
+    .logo {
+      font-size: 1.8rem; font-weight: 700; letter-spacing: 3px;
+      color: var(--accent); text-transform: uppercase; line-height: 1;
+      cursor: pointer; text-decoration: none;
+    }
+    .logo small { display: block; font-size: 0.6rem; letter-spacing: 5px; color: #8890a0; font-weight: 400; }
+    .nav-links { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .nav-links a, .nav-links button {
+      color: #c0c5ce; text-decoration: none; font-weight: 500;
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
+      transition: color 0.2s; white-space: nowrap; background: none;
+      border: none; cursor: pointer; font-family: inherit;
+    }
+    .nav-links a:hover, .nav-links button:hover { color: var(--accent); }
+    .phone-btn {
+      background: var(--accent); color: #fff !important;
+      padding: 9px 18px; border-radius: 30px; font-weight: 700;
+      text-decoration: none; font-size: 0.85rem;
+    }
+    .phone-btn:hover { background: var(--accent-hover); }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, #fdf8f0 0%, #f8f7f4 100%); padding: 50px 0; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .hero-content h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; color: var(--bg-dark); }
+    .hero-content h1 span { color: var(--accent); border-bottom: 3px solid var(--accent); }
+    .hero-stats { display: flex; gap: 24px; margin: 24px 0; flex-wrap: wrap; }
+    .stat-item { text-align: center; min-width: 70px; }
+    .stat-number { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    .hero-visual {
+      background: #fff; border-radius: var(--radius); height: 240px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; box-shadow: 20px 20px 0 rgba(232,168,80,0.15);
+      border: 2px solid var(--accent-soft);
+    }
+
+    /* Карточки */
+    .home-cards-section { padding: 50px 0; background: var(--white); }
+    .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 28px; color: var(--bg-dark); text-align: center; }
+    .home-cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 24px; margin-bottom: 32px;
+    }
+    .product-card {
+      background: var(--white); border: 2px solid var(--border-light); border-radius: var(--radius);
+      padding: 22px; transition: all 0.3s; display: flex; flex-direction: column; cursor: pointer;
+    }
+    .product-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .product-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .product-category {
+      color: var(--accent); font-weight: 600; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 1px; background: var(--accent-soft);
+      display: inline-block; padding: 3px 10px; border-radius: 20px; align-self: flex-start;
+    }
+    .product-title { font-weight: 700; font-size: 1.05rem; margin: 8px 0; color: var(--bg-dark); }
+    .product-specs { font-size: 0.78rem; color: var(--text-light); margin: 4px 0; }
+    .product-price { font-weight: 700; font-size: 1.3rem; margin: 10px 0; color: var(--bg-dark); }
+    .product-actions { display: flex; gap: 8px; margin-top: auto; }
+
+    /* About */
+    .about-section { padding: 50px 0; background: #fdf8f0; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+    .feature-list { list-style: none; }
+    .feature-list li {
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.9rem;
+    }
+    .feature-list li::before { content: "✓"; color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+    .info-card { background: var(--white); padding: 24px; border-radius: var(--radius); font-size: 0.9rem; box-shadow: var(--shadow-sm); }
+
+    /* Каталог */
+    .filter-panel {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
+      background: var(--white); padding: 18px; border-radius: var(--radius);
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); align-items: center;
+    }
+    .filter-btn {
+      background: transparent; border: 2px solid #ddd; padding: 9px 18px;
+      font-weight: 600; cursor: pointer; border-radius: 30px; transition: all 0.2s;
+      font-size: 0.82rem; white-space: nowrap; font-family: inherit; color: var(--text-mid);
+    }
+    .filter-btn.active { background: var(--bg-dark); color: white; border-color: var(--bg-dark); }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active:hover { color: white; }
+    .smart-search-wrapper { position: relative; margin-left: auto; width: 260px; }
+    .search-input {
+      width: 100%; padding: 10px 40px 10px 16px; border: 2px solid #ddd;
+      border-radius: 30px; font-weight: 500; font-size: 0.85rem; outline: none;
+      transition: all 0.3s; background: var(--white); font-family: inherit;
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,168,80,0.15); }
+    .search-suggestions {
+      position: absolute; top: 100%; left: 0; width: 100%; background: var(--white);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md); z-index: 50; margin-top: 5px;
+      display: none; max-height: 250px; overflow-y: auto;
+    }
+    .search-suggestions.active { display: block; }
+    .suggestion-item {
+      padding: 10px 16px; cursor: pointer; display: flex; align-items: center;
+      gap: 10px; transition: background 0.2s; border-bottom: 1px solid #f5f5f5; font-size: 0.85rem;
+    }
+    .suggestion-item:hover { background: var(--accent-soft); }
+    .highlight-match { background: #fef3c7; padding: 0 2px; border-radius: 2px; }
+
+    /* Contacts */
+    .contacts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .map-container {
+      border-radius: var(--radius); overflow: hidden; border: 2px solid var(--border-light);
+      min-height: 380px;
+    }
+    .contact-card {
+      background: #fdf8f0; padding: 28px; border-radius: var(--radius);
+      font-size: 0.9rem; border: 2px solid var(--border-light);
+    }
+
+    /* Footer */
+    footer { background: var(--bg-dark); color: #8890a0; padding: 22px 0; text-align: center; font-size: 0.82rem; }
+
+    .no-results { display: none; text-align: center; padding: 30px; color: #999; grid-column: 1 / -1; }
+
+    /* Корзина в модалке */
+    .cart-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid var(--border-light); gap: 12px;
+    }
+    .cart-item-info { flex: 1; }
+    .cart-item-controls { display: flex; align-items: center; gap: 10px; }
+    .qty-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ddd;
+      background: white; cursor: pointer; font-weight: 700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .qty-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .remove-btn { color: #d44; cursor: pointer; background: none; border: none; font-size: 1.2rem; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 30px; right: 30px; background: var(--bg-dark);
+      color: white; padding: 14px 24px; border-radius: 30px; font-weight: 600;
+      z-index: 2000; animation: slideUp 0.3s ease; box-shadow: var(--shadow-md);
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Мобильная адаптация */
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .nav-links { width: 100%; justify-content: flex-start; }
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { height: 180px; font-size: 4rem; }
+      .hero-content h1 { font-size: 1.8rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .contacts-grid { grid-template-columns: 1fr; }
+      .home-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+      .smart-search-wrapper { width: 100%; margin-left: 0; }
+      .filter-panel { flex-direction: column; align-items: stretch; }
+      .catalog-header { flex-direction: column; align-items: flex-start; }
+      .floating-cart { left: 8px; padding: 10px 8px; }
+      .floating-cart-icon { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .home-cards-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { gap: 8px; }
+      .nav-links a, .nav-links button { font-size: 0.75rem; }
+      .floating-cart { left: 4px; padding: 8px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Анимация -->
+  <div class="box-animation-overlay" aria-hidden="true">
+    <div class="box-scene"><div class="box-lid"></div><div class="box-body">📦</div><div class="box-text">LEBON</div></div>
+  </div>
+
+  <!-- Летающая корзина -->
+  <div class="floating-cart" id="floatingCart" title="Открыть корзину">
+    <span class="floating-cart-icon">🛒</span>
+    <span class="floating-cart-count" id="floatingCartCount">0</span>
+    <span class="floating-cart-total" id="floatingCartTotal">0 ₽</span>
+  </div>
+
+  <!-- Модалка товара -->
+  <div class="modal-overlay" id="productModal"><div class="modal-content" id="modalContent"></div></div>
+
+  <!-- Модалка корзины -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-content cart-modal-content" id="cartModalContent" style="max-width:620px;"></div>
+  </div>
+
+  <!-- Полноэкранный каталог -->
+  <div class="fullscreen-catalog" id="fullscreenCatalog">
+    <div class="container">
+      <div class="catalog-header">
+        <h2 style="font-size:1.5rem; font-weight:700; color:var(--bg-dark);">📦 Каталог упаковочных коробок</h2>
+        <button class="btn" id="closeCatalogBtn">← На главную</button>
+      </div>
+      <div class="filter-panel">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;" id="fullscreenCategoryFilters">
+          <button class="filter-btn active" data-filter="all">Все</button>
+          <button class="filter-btn" data-filter="Крафтовые">Крафт</button>
+          <button class="filter-btn" data-filter="Премиум">Премиум</button>
+          <button class="filter-btn" data-filter="Почтовые">Маркетплейсы</button>
+          <button class="filter-btn" data-filter="Кондитерские">Кондитерские</button>
+          <button class="filter-btn" data-filter="Подарочные">Подарочные</button>
+        </div>
+        <div class="smart-search-wrapper">
+          <input type="text" class="search-input" id="fullscreenSearchInput" placeholder="🔍 Умный поиск..." autocomplete="off">
+          <div class="search-suggestions" id="fullscreenSuggestions"></div>
+        </div>
+      </div>
+      <div class="products-grid" id="fullscreenProductsContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:20px;"></div>
+      <div class="no-results" id="fullscreenNoResults">😔 Коробки не найдены.</div>
+    </div>
+  </div>
+
+  <!-- Страница контактов -->
+  <div class="contacts-page" id="contactsPage">
+    <div class="container">
+      <button class="btn btn-outline" id="contactsBackBtn" style="margin-bottom:20px;">← На главную</button>
+      <h2 class="section-title">Контакты и режим работы</h2>
+      <div class="contacts-grid">
+        <div class="map-container">
+          <iframe src="https://yandex.ru/map-widget/v1/?ll=37.617700%2C55.755800&z=15&pt=37.617700,55.755800,pm2rdm&l=map" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" title="Яндекс Карта: офис LEBON"></iframe>
+        </div>
+        <div class="contact-card">
+          <h3>Центральный офис и производство</h3>
+          <p style="margin:12px 0;">📍 Москва, ул. Производственная, д. 15, стр. 3</p>
+          <p style="margin:12px 0;">📞 <strong>+7 (495) 123-45-67</strong></p>
+          <p style="margin:12px 0;">📧 <strong>order@lebon-pack.ru</strong></p>
+          <hr style="margin:16px 0; border-color:#e0d8c8;">
+          <h4>Режим работы</h4>
+          <p>Пн–Пт: <strong>9:00 – 19:00</strong></p>
+          <p>Сб: <strong>10:00 – 16:00</strong></p>
+          <hr style="margin:16px 0; border-color:#e0d8c8;">
+          <button class="btn btn-accent" style="width:100%;" onclick="showToast('📞 Заявка отправлена!')">Заказать звонок</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo" id="logoBtn">LEBON<small>упаковочные системы</small></div>
+      <nav class="nav-links">
+        <button id="catalogMenuBtn">📦 Каталог</button>
+        <button id="contactsMenuBtn">📋 Контакты</button>
+        <a href="tel:+74951234567" class="phone-btn">+7 (495) 123-45-67</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <h1>Производство <span>упаковочных коробок</span> с гарантией</h1>
+          <p style="font-size:1rem; color:var(--text-mid); margin-bottom:16px;">LEBON — 12 лет создаем коробки для бизнеса. От дизайна до доставки за 3 дня.</p>
+          <div class="hero-stats">
+            <div class="stat-item"><span class="stat-number">12+</span><br>лет опыта</div>
+            <div class="stat-item"><span class="stat-number">850+</span><br>клиентов</div>
+            <div class="stat-item"><span class="stat-number">3 дня</span><br>изготовление</div>
+          </div>
+          <button class="btn btn-accent" id="heroCatalogBtn">Открыть каталог</button>
+        </div>
+        <div class="hero-visual">📦</div>
+      </div>
+    </section>
+
+    <section class="home-cards-section">
+      <div class="container">
+        <h2 class="section-title">Популярные коробки</h2>
+        <div class="home-cards-grid" id="homeCardsGrid"></div>
+        <div style="text-align:center;">
+          <button class="btn" id="homeOpenCatalogBtn">Смотреть весь каталог</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="container">
+        <h2 class="section-title">О компании LEBON</h2>
+        <div class="about-grid">
+          <div>
+            <p style="margin-bottom:16px; font-size:0.9rem;">Специализируемся на проектировании и производстве упаковочных коробок из картона, микрогофрокартона и дизайнерских материалов.</p>
+            <ul class="feature-list">
+              <li>Разработка конструкции под ваш товар</li>
+              <li>Полноцветная печать (CMYK + Pantone)</li>
+              <li>Ламинирование, тиснение, конгрев</li>
+              <li>Доставка по РФ транспортными компаниями</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <h3>Производственная база</h3>
+            <p>🏭 1200 м² площадей</p>
+            <p>🖨️ 5 печатных линий</p>
+            <p>📐 Конструкторское бюро</p>
+            <p>✅ Сертификаты ISO 9001, FSC</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container"><p>© 2013–2026 LEBON Упаковочные системы. Производство коробок в Москве.</p></div>
+  </footer>
+
+  <script>
+    (function() {
+      const products = [
+        { id:1, name:"Крафт-бокс стандарт", category:"Крафтовые", price:85, icon:"📦", specs:"280 г/м², 200×150×100 мм", desc:"Универсальная крафтовая коробка.", material:"Крафт-картон 280 г/м²", size:"200×150×100 мм", minOrder:"от 100 шт", delivery:"3-5 дней", keywords:"крафт картон универсальная" },
+        { id:2, name:"Белый премиум люкс", category:"Премиум", price:340, icon:"🤍", specs:"Мелованный картон, магнит", desc:"Белая коробка с магнитной крышкой.", material:"Мелованный картон 300 г/м²", size:"250×200×80 мм", minOrder:"от 50 шт", delivery:"5-7 дней", keywords:"белый премиум магнитная" },
+        { id:3, name:"Почтовый пакет-бокс", category:"Почтовые", price:62, icon:"📬", specs:"Микрогофрокартон", desc:"Для Wildberries, Ozon, Яндекс Маркет.", material:"Микрогофрокартон", size:"300×200×150 мм", minOrder:"от 200 шт", delivery:"2-3 дня", keywords:"почта маркетплейс вайлдберриз озон" },
+        { id:4, name:"Окошко для десертов", category:"Кондитерские", price:115, icon:"🧁", specs:"ПЭТ-окно, 180×120 мм", desc:"Коробка с прозрачным окном.", material:"Картон 250 г/м² + ПЭТ", size:"180×120×80 мм", minOrder:"от 50 шт", delivery:"3-4 дня", keywords:"окно десерт пирожное прозрачная" },
+        { id:5, name:"Подарочный магнит", category:"Подарочные", price:290, icon:"🎁", specs:"Дизайнерская бумага", desc:"Стильная коробка с магнитным замком.", material:"Дизайнерская бумага 250 г/м²", size:"220×160×100 мм", minOrder:"от 30 шт", delivery:"5-7 дней", keywords:"подарок магнит стильная" },
+        { id:6, name:"Крафт эко-лайн", category:"Крафтовые", price:70, icon:"🌿", specs:"100% переработка", desc:"Экологичная крафтовая упаковка.", material:"Переработанный крафт", size:"150×150×100 мм", minOrder:"от 200 шт", delivery:"3-5 дней", keywords:"эко переработка экологичная" },
+        { id:7, name:"Черный бархат", category:"Премиум", price:520, icon:"🖤", specs:"Бархат, 250×200 мм", desc:"Элитная коробка для украшений.", material:"Бархат на картоне", size:"250×200×60 мм", minOrder:"от 20 шт", delivery:"7-10 дней", keywords:"черный бархат элитная украшения" },
+        { id:8, name:"Фулфилмент бокс", category:"Почтовые", price:48, icon:"📦", specs:"Трехслойный гофрокартон", desc:"Прочная коробка для логистики.", material:"Трехслойный гофрокартон", size:"400×300×200 мм", minOrder:"от 100 шт", delivery:"2-3 дня", keywords:"фулфилмент логистика прочная" },
+        { id:9, name:"Торт-бокс высокий", category:"Кондитерские", price:210, icon:"🎂", specs:"300×300×150 мм", desc:"Высокая коробка с ручкой.", material:"Картон 300 г/м²", size:"300×300×150 мм", minOrder:"от 30 шт", delivery:"4-5 дней", keywords:"торт высокий ручка" },
+        { id:10, name:"Золотое тиснение", category:"Подарочные", price:450, icon:"✨", specs:"Фольга, рифленый картон", desc:"Коробка с золотым тиснением.", material:"Рифленый картон + фольга", size:"200×150×80 мм", minOrder:"от 30 шт", delivery:"7-10 дней", keywords:"золото тиснение фольга" },
+      ];
+
+      let cart = JSON.parse(localStorage.getItem('lebon_cart_v2') || '[]');
+      function saveCart() { localStorage.setItem('lebon_cart_v2', JSON.stringify(cart)); }
+      function getCartTotal() { return cart.reduce((sum, i) => sum + i.price * i.qty, 0); }
+      function getCartCount() { return cart.reduce((sum, i) => sum + i.qty, 0); }
+      function updateFloatingCart() {
+        document.getElementById('floatingCartCount').textContent = getCartCount();
+        document.getElementById('floatingCartTotal').textContent = getCartTotal() + ' ₽';
+        const countEl = document.getElementById('floatingCartCount');
+        countEl.style.animation = 'none';
+        countEl.offsetHeight;
+        countEl.style.animation = 'popIn 0.3s ease';
+      }
+
+      function addToCart(product, qty = 1) {
+        const existing = cart.find(i => i.id === product.id);
+        if (existing) existing.qty += qty;
+        else cart.push({...product, qty});
+        saveCart(); updateFloatingCart();
+        showToast(`✅ ${product.name} в корзине`);
+      }
+      function removeFromCart(id) { cart = cart.filter(i => i.id !== id); saveCart(); updateFloatingCart(); renderCartModal(); }
+      function updateQty(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) { removeFromCart(id); return; }
+        saveCart(); updateFloatingCart(); renderCartModal();
+      }
+
+      function renderCartModal() {
+        const content = document.getElementById('cartModalContent');
+        if (cart.length === 0) {
+          content.innerHTML = `<button class="modal-close" onclick="document.getElementById('cartModal').classList.remove('active')">✕</button><h3 style="text-align:center;">🛒 Корзина пуста</h3><p style="text-align:center;color:#888;">Добавьте коробки из каталога</p>`;
+          return;
+        }
+        content.innerHTML = `
+          <button class="modal-close" onclick="document.getElementById('cartModal').classList.remove('active')">✕</button>
+          <h3 style="margin-bottom:20px;">🛒 Ваша корзина</h3>
+          ${cart.map(i => `
+            <div class="cart-item">
+              <span style="font-size:2rem;">${i.icon}</span>
+              <div class="cart-item-info"><strong>${i.name}</strong><div style="color:#888;font-size:0.8rem;">${i.category} | ${i.price} ₽/шт</div></div>
+              <div class="cart-item-controls">
+                <button class="qty-btn" onclick="window.cartUpdateQty(${i.id},-1)">−</button>
+                <span style="font-weight:700;min-width:24px;text-align:center;">${i.qty}</span>
+                <button class="qty-btn" onclick="window.cartUpdateQty(${i.id},1)">+</button>
+                <button class="remove-btn" onclick="window.cartRemove(${i.id})">🗑️</button>
+              </div>
+              <div style="font-weight:700;min-width:80px;text-align:right;">${i.price * i.qty} ₽</div>
+            </div>
+          `).join('')}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:2px solid var(--border-light);">
+            <strong style="font-size:1.2rem;">Итого: ${getCartTotal()} ₽</strong>
+            <button class="btn btn-accent" onclick="window.submitCart()">📩 Отправить заявку</button>
+          </div>`;
+      }
+
+      window.cartUpdateQty = (id, d) => updateQty(id, d);
+      window.cartRemove = (id) => removeFromCart(id);
+      window.submitCart = function() {
+        if (!cart.length) return;
+        const text = cart.map(i => `${i.name} x${i.qty} — ${i.price*i.qty} ₽`).join('\n');
+        alert(`📋 Ваш заказ:\n\n${text}\n\nИтого: ${getCartTotal()} ₽\n\nМенеджер свяжется с вами!`);
+        cart = []; saveCart(); updateFloatingCart(); renderCartModal();
+        document.getElementById('cartModal').classList.remove('active');
+      };
+
+      function showToast(msg) {
+        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
+      }
+
+      const mainContent = document.getElementById('mainContent');
+      const contactsPage = document.getElementById('contactsPage');
+      const fullscreenCatalog = document.getElementById('fullscreenCatalog');
+      const productModal = document.getElementById('productModal');
+      const modalContent = document.getElementById('modalContent');
+      const homeCardsGrid = document.getElementById('homeCardsGrid');
+      const fullscreenSearchInput = document.getElementById('fullscreenSearchInput');
+      const fullscreenSuggestions = document.getElementById('fullscreenSuggestions');
+
+      function showMainPage() {
+        mainContent.style.display = 'block';
+        contactsPage.classList.remove('active');
+        fullscreenCatalog.classList.remove('active');
+      }
+      function showContactsPage() {
+        mainContent.style.display = 'none';
+        contactsPage.classList.add('active');
+        fullscreenCatalog.classList.remove('active');
+      }
+      function showFullscreenCatalog() {
+        mainContent.style.display = 'none';
+        contactsPage.classList.remove('active');
+        fullscreenCatalog.classList.add('active');
+        renderFullscreenCatalog();
+        fullscreenSearchInput.value = '';
+        fullscreenSuggestions.classList.remove('active');
+        document.querySelectorAll('#fullscreenCategoryFilters .filter-btn').forEach(b => b.classList.remove('active'));
+        const ab = document.querySelector('#fullscreenCategoryFilters .filter-btn[data-filter="all"]');
+        if (ab) ab.classList.add('active');
+      }
+
+      document.getElementById('logoBtn').addEventListener('click', showMainPage);
+      document.getElementById('contactsMenuBtn').addEventListener('click', showContactsPage);
+      document.getElementById('catalogMenuBtn').addEventListener('click', showFullscreenCatalog);
+      document.getElementById('heroCatalogBtn').addEventListener('click', showFullscreenCatalog);
+      document.getElementById('homeOpenCatalogBtn').addEventListener('click', showFullscreenCatalog);
+      document.getElementById('closeCatalogBtn').addEventListener('click', showMainPage);
+      document.getElementById('contactsBackBtn').addEventListener('click', showMainPage);
+      document.getElementById('floatingCart').addEventListener('click', () => {
+        renderCartModal();
+        document.getElementById('cartModal').classList.add('active');
+      });
+
+      productModal.addEventListener('click', e => { if (e.target === productModal) productModal.classList.remove('active'); });
+      document.getElementById('cartModal').addEventListener('click', e => { if (e.target === document.getElementById('cartModal')) document.getElementById('cartModal').classList.remove('active'); });
+
+      function openProductModal(p) {
+        modalContent.innerHTML = `
+          <button class="modal-close" onclick="document.getElementById('productModal').classList.remove('active')">✕</button>
+          <div style="text-align:center;font-size:4rem;margin-bottom:16px;">${p.icon}</div>
+          <span style="color:var(--accent);font-weight:600;text-transform:uppercase;">${p.category}</span>
+          <h2 style="margin:8px 0;font-size:1.6rem;">${p.name}</h2>
+          <p style="margin-bottom:16px;">${p.desc}</p>
+          <div style="background:#fdf8f0;padding:16px;border-radius:12px;margin-bottom:16px;">
+            <p><strong>Материал:</strong> ${p.material}</p><p><strong>Размеры:</strong> ${p.size}</p>
+            <p><strong>Мин. заказ:</strong> ${p.minOrder}</p><p><strong>Доставка:</strong> ${p.delivery}</p>
+            <p><strong>Цена:</strong> <span style="font-size:1.4rem;font-weight:700;">${p.price} ₽/шт</span></p>
+          </div>
+          <button class="btn btn-accent" style="width:100%;" onclick="window.addToCartById(${p.id});document.getElementById('productModal').classList.remove('active');">🛒 Добавить в корзину</button>`;
+        productModal.classList.add('active');
+      }
+
+      window.addToCartById = (id) => { const p = products.find(x => x.id === id); if (p) addToCart(p); };
+      window.openProductModal = (id) => { const p = products.find(x => x.id === id); if (p) openProductModal(p); };
+
+      function renderHomeCards() {
+        homeCardsGrid.innerHTML = products.slice(0,6).map(p => `
+          <div class="product-card" onclick="window.openProductModal(${p.id})">
+            <div class="product-icon">${p.icon}</div>
+            <span class="product-category">${p.category}</span>
+            <h3 class="product-title">${p.name}</h3>
+            <p class="product-specs">${p.specs}</p>
+            <div class="product-price">${p.price} ₽/шт</div>
+            <div class="product-actions">
+              <button class="btn btn-sm" onclick="event.stopPropagation();window.openProductModal(${p.id})" style="flex:1;">Подробнее</button>
+              <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();window.addToCartById(${p.id})">🛒</button>
+            </div>
+          </div>`).join('');
+      }
+
+      function renderFullscreenCatalog() {
+        const container = document.getElementById('fullscreenProductsContainer');
+        const noResults = document.getElementById('fullscreenNoResults');
+        const activeBtn = document.querySelector('#fullscreenCategoryFilters .filter-btn.active');
+        const cat = activeBtn ? activeBtn.dataset.filter : 'all';
+        const q = fullscreenSearchInput.value.trim().toLowerCase();
+        let filtered = products.filter(p => {
+          const cm = cat === 'all' || p.category === cat;
+          if (!q || q.length < 2) return cm;
+          const s = `${p.name} ${p.category} ${p.material} ${p.size} ${p.desc} ${p.keywords}`.toLowerCase();
+          return cm && s.includes(q);
+        });
+        if (!filtered.length) { container.innerHTML = ''; noResults.style.display = 'block'; return; }
+        noResults.style.display = 'none';
+        container.innerHTML = filtered.map(p => `
+          <div class="product-card" onclick="window.openProductModal(${p.id})">
+            <div class="product-icon">${p.icon}</div>
+            <span class="product-category">${p.category}</span>
+            <h3 class="product-title">${p.name}</h3>
+            <p class="product-specs">${p.specs}</p>
+            <p style="font-size:0.8rem;color:var(--text-light);">${p.desc}</p>
+            <div class="product-price">${p.price} ₽/шт</div>
+            <div class="product-actions">
+              <button class="btn btn-sm" onclick="event.stopPropagation();window.openProductModal(${p.id})" style="flex:1;">Подробнее</button>
+              <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();window.addToCartById(${p.id})">🛒</button>
+            </div>
+          </div>`).join('');
+      }
+
+      function highlightMatch(text, query) {
+        if (!query || query.length < 2) return text;
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<span class="highlight-match">$1</span>');
+      }
+
+      function smartSearch(query) {
+        if (!query || query.length < 2) { fullscreenSuggestions.classList.remove('active'); return; }
+        const q = query.toLowerCase();
+        const results = products.filter(p => {
+          const s = `${p.name} ${p.category} ${p.material} ${p.size} ${p.desc} ${p.keywords}`.toLowerCase();
+          return s.includes(q);
+        }).slice(0,5);
+        if (results.length) {
+          fullscreenSuggestions.innerHTML = results.map(p => `
+            <div class="suggestion-item" data-id="${p.id}">
+              <span>${p.icon}</span>
+              <div><div>${highlightMatch(p.name, query)}</div><div style="font-size:0.75rem;color:var(--accent);">${p.category} — ${p.price} ₽</div></div>
+            </div>`).join('');
+          fullscreenSuggestions.classList.add('active');
+        } else {
+          fullscreenSuggestions.innerHTML = '<div style="padding:12px;text-align:center;color:#999;">Ничего не найдено</div>';
+          fullscreenSuggestions.classList.add('active');
+        }
+      }
+
+      let db;
+      fullscreenSearchInput.addEventListener('input', function() {
+        clearTimeout(db);
+        const v = this.value.trim();
+        db = setTimeout(() => { smartSearch(v); renderFullscreenCatalog(); }, 200);
+      });
+      fullscreenSuggestions.addEventListener('click', function(e) {
+        const item = e.target.closest('.suggestion-item');
+        if (item) {
+          const id = parseInt(item.dataset.id);
+          const p = products.find(x => x.id === id);
+          if (p) { fullscreenSearchInput.value = p.name; fullscreenSuggestions.classList.remove('active'); openProductModal(p); }
+        }
+      });
+      document.addEventListener('click', e => { if (!e.target.closest('.smart-search-wrapper')) fullscreenSuggestions.classList.remove('active'); });
+      fullscreenSearchInput.addEventListener('keydown', function(e) {
+        const items = fullscreenSuggestions.querySelectorAll('.suggestion-item');
+        if (!items.length) return;
+        const cur = fullscreenSuggestions.querySelector('.suggestion-item.active');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (!cur) { items[0].classList.add('active'); items[0].style.background='var(--accent-soft)'; }
+          else { cur.classList.remove('active'); cur.style.background=''; const n = cur.nextElementSibling || items[0]; n.classList.add('active'); n.style.background='var(--accent-soft)'; }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (!cur) { items[items.length-1].classList.add('active'); items[items.length-1].style.background='var(--accent-soft)'; }
+          else { cur.classList.remove('active'); cur.style.background=''; const p = cur.previousElementSibling || items[items.length-1]; p.classList.add('active'); p.style.background='var(--accent-soft)'; }
+        } else if (e.key === 'Enter') { e.preventDefault(); if (cur) cur.click(); }
+      });
+      document.querySelectorAll('#fullscreenCategoryFilters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('#fullscreenCategoryFilters .filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active'); fullscreenSuggestions.classList.remove('active'); renderFullscreenCatalog();
+        });
+      });
+
+      updateFloatingCart();
+      renderHomeCards();
+      setTimeout(() => { const o = document.querySelector('.box-animation-overlay'); if (o) o.style.display = 'none'; }, 3000);
+      showMainPage();
+    })();
+  </script>
+</body>
+</html>
